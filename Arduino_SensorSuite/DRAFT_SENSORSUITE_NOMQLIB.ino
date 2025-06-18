@@ -1,9 +1,9 @@
 //#include <Wire.h>
 // #include <SPI.h>
-// #include <Adafruit_BMP280.h>
-// #include <DFRobot_LWLP.h>
-// #include "SparkFun_SGP30_Arduino_Library.h"
-#include "PMS.h" //https://github.com/fu-hsi/PMS/tree/master
+// #include <Adafruit_BMP280.h> // https://github.com/adafruit/Adafruit_BMP280_Library
+// #include <DFRobot_LWLP.h> // https://github.com/DFRobot/DFRobot_LWLP
+// #include "SparkFun_SGP30_Arduino_Library.h" // https://github.com/sparkfun/SparkFun_SGP30_Arduino_Library
+#include "PMS.h" https://github.com/fu-hsi/PMS/tree/master
 //#include <AltSoftSerial.h>
 #include <SoftwareSerial.h>
 
