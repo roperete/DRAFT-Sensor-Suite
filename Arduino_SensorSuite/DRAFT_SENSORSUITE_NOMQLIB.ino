@@ -90,7 +90,7 @@ void loop() {
 
   Serial.println(F("Starting 90s heating cycle for the MQ7"));
   // 90s heating cycle = 180 loops (90000ms / 500ms = 120)
-  for(int i = 0; i < 10 ; i++) {
+  for(int i = 0; i < 120 ; i++) {
     Serial.print(F("Heating loop: ")); Serial.println(i);
     analogWrite(PWMPIN, 255); // 5V heating
     delay(500);
@@ -100,7 +100,7 @@ void loop() {
   Serial.println(F("SWITCH TO SENSING -- MQ7"));
   Serial.println(F("SWITCH TO SENSING -- 90s"));
   analogWrite(PWMPIN, 71);
-  for(int i = 0; i < 180; i++) {
+  for(int i = 0; i < 90; i++) {
 
     unsigned long startTime = millis();
     Serial.print(F(" Sensing loop: ")); Serial.println(i);
