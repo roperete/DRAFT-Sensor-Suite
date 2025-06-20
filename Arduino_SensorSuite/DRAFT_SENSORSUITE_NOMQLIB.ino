@@ -46,15 +46,18 @@ PMS pms(pmsSerial);
 Adafruit_BMP280 bmp; // I2C 0X77
 SGP30 mySensor; //create an object of the SGP30 class I2C 0X58
 DFRobot_LWLP lwlp; // 0x00
-
-
 PMS::DATA datapms;
+
+
 
 float readMQ(int analogPin, float RL, float R0, float a, float b, int voltagePin = 0);
 float calculateR0(int analogPin, float RL, float a, float b, float ppm, int voltagePin = 0);
 float calculateR0FromRatio(int analogPin, float RL, float ratioRS_R0);
 float calculateR0FromRatio(int analogPin, float RL, float ratioRS_R0,int voltagePin = 0);
-float getAirVelocity(float pressureDiff, float airDensity = 1.225);
+float calculateFlowRate(float deltaPressure, float T,float pressure);
+float GetAirDensity(float T, float pressure);
+
+float Calibration;
 
 void setup() {
   Serial.begin(9600); //Init serial port
@@ -79,6 +82,12 @@ void setup() {
   }
   delay(1000);
 
+  for(int i=0;i<100;i++){
+    data = lwlp.getData();
+    delay(20);  
+    Calibration+=data.presure;
+  }
+  Calibration=Calibration/100;
   //SGP30 SETUP
   mySensor.begin();
   mySensor.initAirQuality();
@@ -90,7 +99,7 @@ void loop() {
 
   Serial.println(F("Starting 90s heating cycle for the MQ7"));
   // 90s heating cycle = 180 loops (90000ms / 500ms = 120)
-  for(int i = 0; i < 120 ; i++) {
+  for(int i = 0; i < 10 ; i++) {
     Serial.print(F("Heating loop: ")); Serial.println(i);
     analogWrite(PWMPIN, 255); // 5V heating
     delay(500);
@@ -100,7 +109,7 @@ void loop() {
   Serial.println(F("SWITCH TO SENSING -- MQ7"));
   Serial.println(F("SWITCH TO SENSING -- 90s"));
   analogWrite(PWMPIN, 71);
-  for(int i = 0; i < 90; i++) {
+  for(int i = 0; i < 180; i++) {
 
     unsigned long startTime = millis();
     Serial.print(F(" Sensing loop: ")); Serial.println(i);
@@ -132,10 +141,11 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.println(F(" Pa"));
 
-    Serial.print(F(" PITOT READING :"));
+    Serial.print(F(" Venturi :"));
     data = lwlp.getData();
-    Serial.print(F(" Air speed : "));
-    Serial.print(getAirVelocity(data.presure));
+    Serial.print(F(" Flow rate : "));
+    float FlowRate=calculateFlowRate(data.presure-Calibration,data.temperature,bmp.readPressure());
+    Serial.print(FlowRate);
     Serial.println(F(" m/s"));
     
     pms.requestRead();
@@ -164,12 +174,12 @@ void loop() {
 float readMQ(int analogPin, float RL, float R0, float a, float b, int voltagePin = 0) {
 
   int rawADC = analogRead(analogPin);
+  int rawVoltageADC = analogRead(voltagePin);
   if (rawADC == 0) return -1; // éviter division par zéro
 
   // Read the input voltage of the sensor to make the correction
   float supplyVoltage = 5.0; //default voltage
   if (voltagePin != 0) {
-    int rawVoltageADC = analogRead(voltagePin);
     if (rawVoltageADC == 0) return -1; // division by zero ?
     supplyVoltage = rawVoltageADC * (5.0 / 1023.0);
   }
@@ -222,11 +232,12 @@ float calculateR0FromRatio(int analogPin, float RL, float ratioRS_R0,int voltage
 
   for (int i = 0; i < 5; i++) {
     int raw = analogRead(analogPin);
+    int rawVoltageADC = analogRead(voltagePin);
     if (raw == 0) return -1; // avoid divide by zero
 
     float supplyVoltage = 5.0; 
     if (voltagePin != 0) {
-      int rawVoltageADC = analogRead(voltagePin);
+
       if (rawVoltageADC == 0) return -1; 
       supplyVoltage = rawVoltageADC * (5.0 / 1023.0);
     }
@@ -242,10 +253,43 @@ float calculateR0FromRatio(int analogPin, float RL, float ratioRS_R0,int voltage
   return R0;
 }
 
-float getAirVelocity(float pressureDiff, float airDensity = 1.225) {
+float calculateFlowRate(float deltaPressure, float T,float pressure) {
+  // Dimensions
+  float D1 = 100.5e-3;  
+  float D2 = 50e-3;     
+  float beta = D2/D1;   
+  
+  const float airDensity = GetAirDensity(T,pressure);
+  const float airViscosity = 1.81e-5; // Pa.s
+  
+  const float dpThreshold = 0.5;
+  if (abs(deltaPressure) < dpThreshold) {
+    return 0.0;
+  }
+  
+  float dp = abs(deltaPressure);
+  
+  float A2 = 3.14159 * pow(D2/2, 2); // m²
+  
+  float Cd = 1;
+  
+  float flowRate_initial = Cd * A2 * sqrt(2 * dp / (airDensity * (1 - pow(beta, 4))));
+  
+  float velocity_D1 = flowRate_initial / (3.14159 * pow(D1/2, 2));
+  float reynolds = (airDensity * velocity_D1 * D1) / airViscosity;
+  
+  if (reynolds < 200000) {
+    float correction = 0.003 / pow(reynolds/100000, 0.5);
+    Cd = Cd + correction;
+    if (Cd > 1.05) Cd = 1.05;
+  }
+  
+  float flowRate = Cd * A2 * sqrt(2 * dp / (airDensity * (1 - pow(beta, 4))));
 
-  pressureDiff = abs(pressureDiff); 
-  float velocity = sqrt((2 * pressureDiff) / airDensity);
-  return velocity; // in meters per second
+  return flowRate; // m³/s
+}
 
+float GetAirDensity(float T, float pressure){
+  const float airDensity = pressure / ((T + 273.15) * 287.05);
+  return airDensity;
 }
