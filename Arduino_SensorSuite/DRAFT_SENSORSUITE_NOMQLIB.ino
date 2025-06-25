@@ -56,8 +56,8 @@ float Calibration;
 //////////////// BEGIN UTILITY FUNCTIONS ///////////////////////////////////
 
 // function to print a CSV message
-void printCSV(long timeStamp, long readNumber, String sensor, String gas, float value){
-  Serial.println(String(timeStamp) + "," + String(readNumber) + "," + "Arduino0" + "," + sensor + "," + gas + "," + String(value));  
+void printCSV(String sensor, String gas, float value){
+  Serial.println( sensor + "," + gas + "," + String(value));  
 }
 
 // this functions reads the analog input of the mq and the voltage input of the sensor if desired to output the ppm concentration of the gaz chosen using the a and b variables
@@ -231,7 +231,6 @@ void setup() {
 void loop() {
   float R0=0;
   DFRobot_LWLP::sLwlp_t data;
-  unsigned long readNumber = 1;
 
 #if HUMAN_READABLE == 1  
   Serial.println(F("Starting 90s heating cycle for the MQ7"));
@@ -269,7 +268,7 @@ void loop() {
     Serial.print(mq7);
     Serial.print(F(" ppm"));
 #else
-    printCSV(startTime, readNumber, "MQ7", "MQ7", mq7 );
+    printCSV("MQ7", "MQ7", mq7 );
 #endif    
 
     float mq4 = readMQ(pinMQ4,MQ4RL,MQ4R0,MQ4A,MQ4B,VpinMQ4) ;  
@@ -278,7 +277,7 @@ void loop() {
     Serial.print(mq4);
     Serial.print(F(" ppm"));
 #else
-    printCSV(startTime, readNumber, "MQ4", "MQ4", mq4 );
+    printCSV("MQ4", "MQ4", mq4 );
 #endif    
 
     float mq135 = readMQ(pinMQ135,MQ135RL,MQ135R0,MQ135A,MQ135B,VpinMQ135);
@@ -288,7 +287,7 @@ void loop() {
     Serial.print(F(" ppm"));
     //R0 = calculateR0(pinMQ135,MQ135RL,MQ135A,MQ135B,850);
 #else
-    printCSV(startTime, readNumber, "MQ135", "MQ135", mq135 );
+    printCSV("MQ135", "MQ135", mq135 );
 #endif    
 
 #if HUMAN_READABLE == 1  
@@ -297,14 +296,14 @@ void loop() {
     Serial.print(F("CO2: "));
     Serial.print(mySensor.CO2);
 #else
-    printCSV(startTime, readNumber, "SGP30", "CO2", mySensor.CO2);
+    printCSV("SGP30", "CO2", mySensor.CO2);
 #endif
 
 #if HUMAN_READABLE == 1
     Serial.print(F(" ppm\tTVOC: "));
     Serial.print(mySensor.TVOC);
 #else
-    printCSV(startTime, readNumber, "SGP30", "TVOC", mySensor.TVOC);
+    printCSV("SGP30", "TVOC", mySensor.TVOC);
 #endif
 
 #if HUMAN_READABLE == 1
@@ -314,7 +313,7 @@ void loop() {
     Serial.print(bmp.readPressure());
     Serial.println(F(" Pa"));
 #else
-    printCSV(startTime, readNumber, "BMP280", "Pressure", bmp.readPressure());
+    printCSV("BMP280", "Pressure", bmp.readPressure());
 #endif    
 
     data = lwlp.getData();
@@ -325,7 +324,7 @@ void loop() {
     Serial.print(FlowRate);
     Serial.println(F(" m/s"));
 #else
-  printCSV(startTime, readNumber, "Venturi", "FlowRate", FlowRate);
+  printCSV("Venturi", "FlowRate", FlowRate);
 #endif
 
     pms.requestRead();
@@ -339,9 +338,9 @@ void loop() {
     Serial.print("PM 10.0 (ug/m3): ");
     Serial.println(datapms.PM_AE_UG_10_0);
 #else
-  printCSV(startTime, readNumber, "PM", "PM1", datapms.PM_AE_UG_1_0);
-  printCSV(startTime, readNumber, "PM", "PM2.5", datapms.PM_AE_UG_2_5);
-  printCSV(startTime, readNumber, "PM", "PM10", datapms.PM_AE_UG_10_0);
+  printCSV( "PM", "PM1", datapms.PM_AE_UG_1_0);
+  printCSV( "PM", "PM2.5", datapms.PM_AE_UG_2_5);
+  printCSV( "PM", "PM10", datapms.PM_AE_UG_10_0);
 #endif    
 
     unsigned long endTime = millis();
@@ -353,7 +352,6 @@ void loop() {
  #endif    
     if (duration < 500) delay(500 - duration);
 
-   readNumber ++;
 
   }
 
