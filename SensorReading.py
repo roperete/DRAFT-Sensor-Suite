@@ -9,6 +9,8 @@ import serial
 import os
 from datetime import datetime
 
+sensorsNum =1
+
 # Function to read data from Arduino
 def read_arduino(port, sensor_name):
     line = port.readline().rstrip().decode('utf-8')
@@ -22,7 +24,8 @@ def write_to_csv(data, csv_file):
 
 # Serial ports for Arduino connections
 port0 = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=1)
-port1 = serial.Serial("/dev/ttyUSB1", baudrate=9600, timeout=1)
+if sensorsNum >1 :
+    port1 = serial.Serial("/dev/ttyUSB1", baudrate=9600, timeout=1)
 
 # Create CSV file if it doesn't exist
 csv_file = 'sensor_data.csv'
@@ -42,9 +45,10 @@ try:
         write_to_csv(arduino0_data, csv_file)
         
         # Read data from Arduino 1
-        arduino1_data = read_arduino(port1, 'Arduino1')
-        arduino1_data = [timestamp, str(read_number)] + arduino1_data
-        write_to_csv(arduino1_data, csv_file)
+        if sensorsNum > 1:
+            arduino1_data = read_arduino(port1, 'Arduino1')
+            arduino1_data = [timestamp, str(read_number)] + arduino1_data
+            write_to_csv(arduino1_data, csv_file)
         
          # Increment read number after both Arduinos have been read
     read_number += 1
