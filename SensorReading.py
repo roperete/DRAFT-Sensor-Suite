@@ -12,10 +12,17 @@ from datetime import datetime
 sensorsNum =1
 
 # Function to read data from Arduino
+# TODO : DD consider returning empty list when data is empty to enable not writing
+#    empty data in CSV
 def read_arduino(port, sensor_name):
     line = port.readline().rstrip().decode('utf-8')
-    data = line.split(',')
-    return [sensor_name] + data
+    l=len(line)
+    print (f"{l} --{line }" )
+    if l > 0:
+        data = line.split(',')
+        return [sensor_name] + data
+    else:
+        return []
 
 # Function to write data to CSV file
 def write_to_csv(data, csv_file):
@@ -41,8 +48,9 @@ try:
         
         # Read data from Arduino 0
         arduino0_data = read_arduino(port0, 'Arduino0')
-        arduino0_data = [timestamp, str(read_number)] + arduino0_data
-        write_to_csv(arduino0_data, csv_file)
+        if arduino0_data: # read a non-empty dat-a during timeout
+            arduino0_data = [timestamp, str(read_number)] + arduino0_data
+            write_to_csv(arduino0_data, csv_file)
         
         # Read data from Arduino 1
         if sensorsNum > 1:
