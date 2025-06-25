@@ -6,6 +6,9 @@
 #include "PMS.h" // https://github.com/fu-hsi/pms
 #include <SoftwareSerial.h>
 
+// DD Set it to 1 for human readable serial write and to 0 to export CSV                
+#define HUMAN_READABLE 0
+
 
 #define placa "Arduino UNO"
 #define Voltage_Resolution 5
@@ -48,125 +51,13 @@ SGP30 mySensor; //create an object of the SGP30 class I2C 0X58
 DFRobot_LWLP lwlp; // 0x00
 PMS::DATA datapms;
 
-
-
-float readMQ(int analogPin, float RL, float R0, float a, float b, int voltagePin = 0);
-float calculateR0(int analogPin, float RL, float a, float b, float ppm, int voltagePin = 0);
-float calculateR0FromRatio(int analogPin, float RL, float ratioRS_R0);
-float calculateR0FromRatio(int analogPin, float RL, float ratioRS_R0,int voltagePin = 0);
-float calculateFlowRate(float deltaPressure, float T,float pressure);
-float GetAirDensity(float T, float pressure);
-
 float Calibration;
 
-void setup() {
-  Serial.begin(9600); //Init serial port
-  pmsSerial.begin(9600);
-  delay(1000);
-  pms.passiveMode();
-  delay(1000);
-  pinMode(PWMPIN, OUTPUT);
-  Wire.begin();
-  
-  // BMP SETUP
-  if (!bmp.begin()) {
-    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
-    while (1);
- }
-  delay(1000);
+//////////////// BEGIN UTILITY FUNCTIONS ///////////////////////////////////
 
-  // PITOT SETUP
-  while (lwlp.begin() != 0) {
-    Serial.println("Failed to initialize the chip, please confirm the chip connection");
-    delay(1000);
-  }
-  delay(1000);
-
-  for(int i=0;i<100;i++){
-    data = lwlp.getData();
-    delay(20);  
-    Calibration+=data.presure;
-  }
-  Calibration=Calibration/100;
-  //SGP30 SETUP
-  mySensor.begin();
-  mySensor.initAirQuality();
-}
-
-void loop() {
-  float R0=0;
-  DFRobot_LWLP::sLwlp_t data;
-
-  Serial.println(F("Starting 90s heating cycle for the MQ7"));
-  // 90s heating cycle = 180 loops (90000ms / 500ms = 120)
-  for(int i = 0; i < 10 ; i++) {
-    Serial.print(F("Heating loop: ")); Serial.println(i);
-    analogWrite(PWMPIN, 255); // 5V heating
-    delay(500);
-  }
-
-  Serial.println(F("SWITCH TO SENSING"));
-  Serial.println(F("SWITCH TO SENSING -- MQ7"));
-  Serial.println(F("SWITCH TO SENSING -- 90s"));
-  analogWrite(PWMPIN, 71);
-  for(int i = 0; i < 180; i++) {
-
-    unsigned long startTime = millis();
-    Serial.print(F(" Sensing loop: ")); Serial.println(i);
-     // 1.4V sensing for the MQ7
-
-    Serial.print(F(" MQ7 READING : "));
-    Serial.print(readMQ(pinMQ7,MQ7RL,MQ7R0,MQ7A,MQ7B));
-    Serial.print(F(" ppm"));
-
-    Serial.print(F("\n MQ4 READING : "));
-    Serial.print(readMQ(pinMQ4,MQ4RL,MQ4R0,MQ4A,MQ4B,VpinMQ4));
-    Serial.print(F(" ppm"));
-
-    Serial.print(F("\n MQ135 READING : "));
-    Serial.print(readMQ(pinMQ135,MQ135RL,MQ135R0,MQ135A,MQ135B,VpinMQ135));
-    Serial.print(F(" ppm"));
-    //R0 = calculateR0(pinMQ135,MQ135RL,MQ135A,MQ135B,850);
-
-    Serial.print(F("\n SGP30 READING :"));
-    mySensor.measureAirQuality();
-    Serial.print(F("CO2: "));
-    Serial.print(mySensor.CO2);
-    Serial.print(F(" ppm\tTVOC: "));
-    Serial.print(mySensor.TVOC);
-    Serial.println(F(" ppb"));
-
-    Serial.print(F(" BMP280 READING :"));
-    Serial.print(F(" Pressure = "));
-    Serial.print(bmp.readPressure());
-    Serial.println(F(" Pa"));
-
-    Serial.print(F(" Venturi :"));
-    data = lwlp.getData();
-    Serial.print(F(" Flow rate : "));
-    float FlowRate=calculateFlowRate(data.presure-Calibration,data.temperature,bmp.readPressure());
-    Serial.print(FlowRate);
-    Serial.println(F(" m/s"));
-    
-    pms.requestRead();
-    pms.readUntil(datapms);
-    Serial.print("PM 1.0 (ug/m3): ");
-    Serial.println(datapms.PM_AE_UG_1_0);
-    Serial.print("PM 2.5 (ug/m3): ");
-    Serial.println(datapms.PM_AE_UG_2_5);
-    Serial.print("PM 10.0 (ug/m3): ");
-    Serial.println(datapms.PM_AE_UG_10_0);
-    
-
-    unsigned long endTime = millis();
-    unsigned long duration = endTime - startTime;
-    Serial.print(" Loop duration: ");
-    Serial.print(duration);
-    Serial.println(" ms\n");
-    if (duration < 500) delay(500 - duration);
-  }
-
-
+// function to print a CSV message
+void printCSV(long timeStamp, long readNumber, String sensor, String gas, float value){
+  Serial.print (String(timeStamp) + "," + String(readNumber) + "," + "Arduino0" + "," + sensor + "," + gas + "," + String(value));  
 }
 
 // this functions reads the analog input of the mq and the voltage input of the sensor if desired to output the ppm concentration of the gaz chosen using the a and b variables
@@ -195,6 +86,7 @@ float readMQ(int analogPin, float RL, float R0, float a, float b, int voltagePin
   return ppm;
 }
 
+
 // this code is used to calibrate the MQ135 using the known CO2 ppm
 float calculateR0(int analogPin, float RL, float a, float b, float ppm, int voltagePin = 0) {
   const int samples = 5;
@@ -221,8 +113,10 @@ float calculateR0(int analogPin, float RL, float a, float b, float ppm, int volt
   float avgRS = totalRS / samples;
   float ratio = pow(ppm / a, 1.0 / b); // Invert ppm = a * (RS/R0)^b
   float R0 = avgRS / ratio;
+#if HUMAN_READABLE == 1  
   Serial.print(F("\n Calculated R0 is : "));
   Serial.print(R0,6);
+#endif  
   return R0;
 }
 
@@ -292,4 +186,176 @@ float calculateFlowRate(float deltaPressure, float T,float pressure) {
 float GetAirDensity(float T, float pressure){
   const float airDensity = pressure / ((T + 273.15) * 287.05);
   return airDensity;
+}  
+
+//////////////// END UTILITY FUNCTIONS ///////////////////////////////////  
+
+void setup() {
+  Serial.begin(9600); //Init serial port
+  pmsSerial.begin(9600);
+  delay(1000);
+  pms.passiveMode();
+  delay(1000);
+  pinMode(PWMPIN, OUTPUT);
+  Wire.begin();
+  
+  // BMP SETUP
+  if (!bmp.begin()) {
+#if HUMAN_READABLE == 1
+    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+# endif    
+    while (1);
+ }
+  delay(1000);
+
+  // PITOT SETUP
+  while (lwlp.begin() != 0) {
+#if HUMAN_READABLE ==1     
+    Serial.println("Failed to initialize the chip, please confirm the chip connection");
+#endif    
+    delay(1000);
+  }
+  delay(1000);
+
+  for(int i=0;i<100;i++){
+    DFRobot_LWLP::sLwlp_t data = lwlp.getData();
+    delay(20);  
+    Calibration+=data.presure;
+  }
+  Calibration=Calibration/100;
+  //SGP30 SETUP
+  mySensor.begin();
+  mySensor.initAirQuality();
 }
+
+void loop() {
+  float R0=0;
+  DFRobot_LWLP::sLwlp_t data;
+
+  long readNumber = 1;
+#if HUMAN_READABLE == 1  
+  Serial.println(F("Starting 90s heating cycle for the MQ7"));
+#endif  
+  // 90s heating cycle = 180 loops (90000ms / 500ms = 120)
+  
+
+  for(int i = 0; i < 10 ; i++) {
+#if HUMAN_READABLE == 1    
+    Serial.print(F("Heating loop: ")); Serial.println(i);
+#endif    
+    analogWrite(PWMPIN, 255); // 5V heating
+    delay(500);
+  }
+
+#if HUMAN_READABLE == 1   
+  Serial.println(F("SWITCH TO SENSING"));
+  Serial.println(F("SWITCH TO SENSING -- MQ7"));
+  Serial.println(F("SWITCH TO SENSING -- 90s"));
+#endif  
+  analogWrite(PWMPIN, 71);
+
+  for(int i = 0; i < 180; i++) {
+    unsigned long startTime = millis();    
+
+// TODO DD: find what sensor & gas  to putr in CSV for MQ sensors
+
+#if HUMAN_READABLE == 1  
+    Serial.print(F(" Sensing loop: ")); Serial.println(i);
+#endif    
+     // 1.4V sensing for the MQ7
+    float mq7 = readMQ(pinMQ7,MQ7RL,MQ7R0,MQ7A,MQ7B);
+#if HUMAN_READABLE == 1 
+    Serial.print(F(" MQ7 READING : "));
+    Serial.print(mq7);
+    Serial.print(F(" ppm"));
+#else
+    printCSV(startTime, readNumber, "MQ7", "MQ7", mq7 );
+#endif    
+
+    float mq4 = readMQ(pinMQ4,MQ4RL,MQ4R0,MQ4A,MQ4B,VpinMQ4) ;  
+#if HUMAN_READABLE == 1     
+    Serial.print(F("\n MQ4 READING : "));
+    Serial.print(mq4);
+    Serial.print(F(" ppm"));
+#else
+    printCSV(startTime, readNumber, "MQ4", "MQ4", mq4 );
+#endif    
+
+    float mq135 = readMQ(pinMQ135,MQ135RL,MQ135R0,MQ135A,MQ135B,VpinMQ135);
+#if HUMAN_READABLE == 1   
+    Serial.print(F("\n MQ135 READING : "));
+    Serial.print(mq135);;
+    Serial.print(F(" ppm"));
+    //R0 = calculateR0(pinMQ135,MQ135RL,MQ135A,MQ135B,850);
+#else
+    printCSV(startTime, readNumber, "MQ135", "MQ135", mq135 );
+#endif    
+
+#if HUMAN_READABLE == 1  
+    Serial.print(F("\n SGP30 READING :"));
+    mySensor.measureAirQuality();
+    Serial.print(F("CO2: "));
+    Serial.print(mySensor.CO2);
+#else
+    printCSV(startTime, readNumber, "SGP30", "CO2", mySensor.CO2);
+#endif
+
+#if HUMAN_READABLE == 1
+    Serial.print(F(" ppm\tTVOC: "));
+    Serial.print(mySensor.TVOC);
+#else
+    printCSV(startTime, readNumber, "SGP30", "TVOC", mySensor.TVOC);
+#endif
+
+#if HUMAN_READABLE == 1
+    Serial.println(F(" ppb"));
+    Serial.print(F(" BMP280 READING :"));
+    Serial.print(F(" Pressure = "));
+    Serial.print(bmp.readPressure());
+    Serial.println(F(" Pa"));
+#else
+    printCSV(startTime, readNumber, "BMP280", "Pressure", bmp.readPressure());
+#endif    
+
+    data = lwlp.getData();
+    float FlowRate=calculateFlowRate(data.presure-Calibration,data.temperature,bmp.readPressure());
+#if HUMAN_READABLE == 1
+    Serial.print(F(" Venturi :"));
+    Serial.print(F(" Flow rate : "));
+    Serial.print(FlowRate);
+    Serial.println(F(" m/s"));
+#else
+  printCSV(startTime, readNumber, "Venturi", "FlowRate", FlowRate);
+#endif
+
+    pms.requestRead();
+    pms.readUntil(datapms);
+
+#if HUMAN_READABLE == 1    
+    Serial.print("PM 1.0 (ug/m3): ");
+    Serial.println(datapms.PM_AE_UG_1_0);
+    Serial.print("PM 2.5 (ug/m3): ");
+    Serial.println(datapms.PM_AE_UG_2_5);
+    Serial.print("PM 10.0 (ug/m3): ");
+    Serial.println(datapms.PM_AE_UG_10_0);
+#else
+  printCSV(startTime, readNumber, "PM", "PM1", datapms.PM_AE_UG_1_0);
+  printCSV(startTime, readNumber, "PM", "PM2.5", datapms.PM_AE_UG_2_5);
+  printCSV(startTime, readNumber, "PM", "PM10", datapms.PM_AE_UG_10_0);
+#endif    
+
+    unsigned long endTime = millis();
+    unsigned long duration = endTime - startTime;
+#if HUMAN_READABLE == 1     
+    Serial.print(" Loop duration: ");
+    Serial.print(duration);
+    Serial.println(" ms\n");
+ #endif    
+    if (duration < 500) delay(500 - duration);
+  }
+
+  readNumber ++;
+
+}
+
+
