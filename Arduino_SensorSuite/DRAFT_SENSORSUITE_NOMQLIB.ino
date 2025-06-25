@@ -57,7 +57,7 @@ float Calibration;
 
 // function to print a CSV message
 void printCSV(long timeStamp, long readNumber, String sensor, String gas, float value){
-  Serial.print (String(timeStamp) + "," + String(readNumber) + "," + "Arduino0" + "," + sensor + "," + gas + "," + String(value));  
+  Serial.println(String(timeStamp) + "," + String(readNumber) + "," + "Arduino0" + "," + sensor + "," + gas + "," + String(value));  
 }
 
 // this functions reads the analog input of the mq and the voltage input of the sensor if desired to output the ppm concentration of the gaz chosen using the a and b variables
@@ -231,8 +231,8 @@ void setup() {
 void loop() {
   float R0=0;
   DFRobot_LWLP::sLwlp_t data;
+  unsigned long readNumber = 1;
 
-  long readNumber = 1;
 #if HUMAN_READABLE == 1  
   Serial.println(F("Starting 90s heating cycle for the MQ7"));
 #endif  
@@ -352,9 +352,12 @@ void loop() {
     Serial.println(" ms\n");
  #endif    
     if (duration < 500) delay(500 - duration);
+
+   readNumber ++;
+
   }
 
-  readNumber ++;
+ 
 
 }
 
