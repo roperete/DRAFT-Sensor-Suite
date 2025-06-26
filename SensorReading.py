@@ -7,8 +7,10 @@ This program reads data coming from the serial port and saves that data to a CSV
 
 import serial
 import os
+import time
 from datetime import datetime
 
+# sensorsNum has value 1 or 2 , it is the number of arduino connections
 sensorsNum =1
 
 # Function to read data from Arduino
@@ -17,7 +19,7 @@ sensorsNum =1
 def read_arduino(port, sensor_name):
     line = port.readline().rstrip().decode('utf-8')
     l=len(line)
-    print (f"{l} --{line }" )
+    #print (f"{l} --{line }" )
     if l > 0:
         data = line.split(',')
         return [sensor_name] + data
@@ -29,8 +31,26 @@ def write_to_csv(data, csv_file):
     with open(csv_file, 'a') as f:
         f.write(','.join(data) + '\n')
 
+################### MAIN #############################################"
 # Serial ports for Arduino connections
-port0 = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=1)
+# DD : accept waiting a bit for the arduino to start
+# so that one can start sensor reading before arduinbo is plugged in
+# TODO : check if really necessary 
+attempt = 1
+opened = False
+while attempt < 50 and not opened:
+    try:
+        port0 = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=1)
+        opened = port0.isOpen()
+    except serial.SerialException:
+        print ("/dev/ttyUSB0 not available")
+        time.sleep(500/1000)
+    attempt += 1
+if attempt >= 50:
+    quit()
+           
+
+
 if sensorsNum >1 :
     port1 = serial.Serial("/dev/ttyUSB1", baudrate=9600, timeout=1)
 
