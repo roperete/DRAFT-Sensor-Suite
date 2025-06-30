@@ -228,6 +228,8 @@ void setup() {
   mySensor.initAirQuality();
 }
 
+///////////////////////////////// LOOP /////////////////////////
+
 void loop() {
   float R0=0;
   DFRobot_LWLP::sLwlp_t data;
@@ -263,6 +265,7 @@ void loop() {
 #endif    
      // 1.4V sensing for the MQ7
     float mq7 = readMQ(pinMQ7,MQ7RL,MQ7R0,MQ7A,MQ7B);
+
 #if HUMAN_READABLE == 1 
     Serial.print(F(" MQ7 READING : "));
     Serial.print(mq7);
@@ -272,6 +275,7 @@ void loop() {
 #endif    
 
     float mq4 = readMQ(pinMQ4,MQ4RL,MQ4R0,MQ4A,MQ4B,VpinMQ4) ;  
+
 #if HUMAN_READABLE == 1     
     Serial.print(F("\n MQ4 READING : "));
     Serial.print(mq4);
@@ -281,6 +285,7 @@ void loop() {
 #endif    
 
     float mq135 = readMQ(pinMQ135,MQ135RL,MQ135R0,MQ135A,MQ135B,VpinMQ135);
+
 #if HUMAN_READABLE == 1   
     Serial.print(F("\n MQ135 READING : "));
     Serial.print(mq135);;
@@ -290,9 +295,9 @@ void loop() {
     printCSV("MQ135", "MQ135", mq135 );
 #endif    
 
+  mySensor.measureAirQuality();
 #if HUMAN_READABLE == 1  
-    Serial.print(F("\n SGP30 READING :"));
-    mySensor.measureAirQuality();
+    Serial.print(F("\n SGP30 READING :"));  
     Serial.print(F("CO2: "));
     Serial.print(mySensor.CO2);
 #else
