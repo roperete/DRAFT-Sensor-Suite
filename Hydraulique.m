@@ -1,3 +1,4 @@
+
 clear
 close all
 
@@ -10,7 +11,7 @@ P_available_history = [];
 
 Q_nom = 594/3600;      % max flow rate [m³/s]
 P_max = 120;           % max pressure [Pa]
-P_available = @(Q) P_max - (P_max/Q_nom^2).*Q.^2;
+P_available = @(Q) P_max - P_max*(Q/Q_nom).^0.551958;
 
 rho = 1.1;              % air density [kg/m³]
 mu = 1.8e-5;            % dynamic viscosity [Pa·s]
@@ -22,7 +23,7 @@ tol = 1e-3;             % tolerance on pressure difference [Pa]
 DP = 0;                 % initial total pressure (losses side)
 Q = Q_nom;
 n = 0;
-max_iter = 10000;        % iteration limit
+max_iter = 100;        % iteration limit
 
 while abs(P_max - DP) > tol && n < max_iter
     DP = 0;  % Reset losses at each iteration
@@ -43,7 +44,46 @@ while abs(P_max - DP) > tol && n < max_iter
     losses = add_loss(losses, 'fan_to_tube', loss1 + loss2+loss0);
     DP = DP + losses.fan_to_tube;
 
-    % Loss 2: venturi tube + sensors
+    %Loss 2: Sensor suite
+    % loss1 = sudden_contraction(D, 0.091, rho, v);
+    % loss2 = expansion_angle(0.091, 0.100, rho, v, 20);
+    % loss3 = singular_loss(0.5, v_100mm, rho);
+    % loss4 = sudden_contraction(0.095, 0.091, rho, v);
+    % loss5 = sudden_contraction(0.1, D, rho, v_100mm);
+    % losst=loss1+loss2+loss3+loss4+loss5;
+    % losses = add_loss(losses, 'sensor_suite_1', losst);
+    % DP=DP+losses.sensor_suite_1;
+
+    % Loss 3: 3-way junction with single active path
+    % losses = add_loss(losses, 'junction_3way', singular_loss(0.7, v, rho));
+    % DP = DP + losses.junction_3way;
+    
+    % Loss 14: Valve
+    % losses=add_loss(losses,'Valve',singular_loss(0.5, v_100mm, rho));
+    % DP=DP+losses.Valve;
+
+    % Loss 4: Elbows group 1
+    elbow_loss_1 = singular_loss(0.7, v, rho);
+    losses = add_loss(losses, 'elbows_group_1', 2 * elbow_loss_1);
+    DP = DP + losses.elbows_group_1;
+    
+    % Loss 5: Soil filter - to be implemented with Darcy's law
+    % losses = add_loss(losses, 'regolith_filter', 100);
+    % DP = DP + losses.regolith_filter;
+    
+   
+    
+    % Loss 6: Elbows group 2
+    elbow_loss_1 = singular_loss(0.7, v, rho);
+    losses = add_loss(losses, 'elbows_group_2', 2 * elbow_loss_1);
+    DP = DP + losses.elbows_group_2;
+    
+    
+    %Loss 7: 3-way reunion 
+    % losses = add_loss(losses, 'reunion_3way', singular_loss(0.7, v, rho));
+    % DP = DP + losses.reunion_3way;
+    
+    % Loss 8: venturi tube + sensors
     loss3 = sudden_expansion(D, 0.1, rho, v);
     loss4 = contraction_angle(0.1, 0.05, rho, v_100mm, 20);
     loss5 = expansion_angle(0.05, 0.1, rho, v_50mm, 20);
@@ -51,60 +91,58 @@ while abs(P_max - DP) > tol && n < max_iter
     losses = add_loss(losses, 'venturi_sensors', loss3 + loss4 + loss5 + loss6);
     DP = DP + losses.venturi_sensors;
     
-    % Loss 3: 3-way junction with single active path
-    % losses = add_loss(losses, 'junction_3way', singular_loss(0.7, v, rho));
-    % DP = DP + losses.junction_3way;
-    
-    % Loss 4: Elbows group 1
-    elbow_loss_1 = singular_loss(0.7, v, rho);
-    losses = add_loss(losses, 'elbows_group_1', 2 * elbow_loss_1);
-    DP = DP + losses.elbows_group_1;
-    
-    % Loss 5: Soil filter - to be implemented with Darcy's law
-    % losses = add_loss(losses, 'regolith_filter', regolith_loss(Q, thickness, properties));
-    % DP = DP + losses.regolith_filter;
-    
-    % Loss 6: Elbows group 2
-    losses = add_loss(losses, 'elbows_group_2', 2 * singular_loss(0.7, v, rho));
-    DP = DP + losses.elbows_group_2;
-    
+    % Loss 8: venturi tube + sensors
     loss3 = sudden_expansion(D, 0.1, rho, v);
-    loss4 = contraction_angle(0.1, 0.075, rho, v_100mm, 23);
-    loss5 = expansion_angle(0.075, 0.1, rho, v_75mm, 23);
+    loss4 = contraction_angle(0.1, 0.075, rho, v_100mm, 20);
+    loss5 = expansion_angle(0.075, 0.1, rho, v_75mm, 20);
     loss6 = sudden_contraction(0.1, D, rho, v_100mm);
     losses = add_loss(losses, 'venturi_sensors2', loss3 + loss4 + loss5 + loss6);
     DP = DP + losses.venturi_sensors2;
-    % Loss 7: 3-way reunion 
-    % losses = add_loss(losses, 'reunion_3way', singular_loss(0.7, v, rho));
-    % DP = DP + losses.reunion_3way;
     
-    % Loss 8: Sensors 
-    % losses = add_loss(losses, 'sensors', singular_loss(0.4, v, rho));
-    % DP = DP + losses.sensors;
+    %Loss 9: Sensor suite
+    % loss1 = sudden_contraction(D, 0.091, rho, v);
+    % loss2 = expansion_angle(0.091, 0.100, rho, v, 20);
+    % loss3 = singular_loss(0.5, v_100mm, rho);
+    % loss4 = sudden_contraction(0.095, 0.091, rho, v);
+    % loss5 = sudden_contraction(0.1, D, rho, v_100mm);
+    % losst=loss1+loss2+loss3+loss4+loss5;
+    % losses = add_loss(losses, 'sensor_suite_2', losst);
+    % DP=DP+losses.sensor_suite_2;
 
-    % Loss 9: Additional Elbows (commented out)
-    % losses = add_loss(losses, 'elbows_additional', 2 * singular_loss(1, v, rho));
-    % DP = DP + losses.elbows_additional;
+    
+    % Loss 10: Additional Elbows
+    % losses = add_loss(losses, 'elbows_section_change', 2 * singular_loss(0.7, v, rho));
+    % DP = DP + losses.elbows_section_change;
 
-    % Loss 11: HEPA filter + expansion
+    % Loss 11: change of section + spiral
+    % loss1 = sudden_contraction(D, 0.075, rho, v);
+    % loss2 = singular_loss(4, v, rho);
+    % loss3 = sudden_expansion(0.075, D, rho, v_75mm);
+    % loss4 = straight_line_loss(rho, mu, v_75mm, 0.075, 0.4);
+    % losst=loss1+loss2+loss3+loss4;
+    % losses = add_loss(losses, 'section_changes_and_spiral', losst);
+    % DP = DP + losses.section_changes_and_spiral;
+
+    % Loss 12: HEPA filter + expansion
 
     losses = add_loss(losses, 'hepa_filter', hepa_filter(Q));
     losses = add_loss(losses, 'hepa_expansion', sudden_expansion(D, 0.100, rho, v));
     losses = add_loss(losses, 'hepa_expansion2', sudden_expansion(0.100, 0.120, rho, v_100mm));
-    losses = add_loss(losses, 'hepa_grill', singular_loss(0.15, v, rho));
-    DP = DP + losses.hepa_filter + losses.hepa_expansion+ losses.hepa_expansion2+losses.hepa_grill;
+    DP = DP + losses.hepa_filter + losses.hepa_expansion+ losses.hepa_expansion2;
 
-    % Loss 12: Long straight tube (2m)
+    % Loss 13: Long straight tube (2m)
     losses = add_loss(losses, 'straight_pipe', straight_line_loss(rho, mu, v, D, 1));
     DP = DP + losses.straight_pipe;
+    
+
     
     % Loss 13: Honeycomb K=0.4
     losses = add_loss(losses, 'honeycomb', singular_loss(0.4, v, rho)+sudden_expansion(D-0.04, D, rho, v)+sudden_contraction(D, D-0.04, rho, v));
     DP = DP + losses.honeycomb;
     
     % Loss 14 : Open tube K=1 add it if the hepa filter is not on !
-    losses = add_loss(losses, 'open_tube', singular_loss(1, v, rho));
-    DP = DP + losses.honeycomb;
+    % losses = add_loss(losses, 'open_tube', singular_loss(1, v, rho));
+    % DP = DP + losses.open_tube;
     % Spiral (if needed): 
     % losses = add_loss(losses, 'spiral', singular_loss(5, v, rho));
     % DP = DP + losses.spiral;
