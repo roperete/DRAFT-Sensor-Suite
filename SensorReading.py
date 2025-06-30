@@ -27,59 +27,76 @@ def read_arduino(port, sensor_name):
         return []
 
 # Function to write data to CSV file
-def write_to_csv(data, csv_file):
-    with open(csv_file, 'a') as f:
-        f.write(','.join(data) + '\n')
+# DD : Should we not avoid opening again and again ?
+def write_to_csv(data, csvFile):
+    csvFile.write(','.join(data) + '\n')
+    csvFile.flush()
+
+# DD : function to open a serial port and retries in case it is not yet available
+# for example start current tool while arduino not yet started
+# returns a open port or none if failed
+def openSerialRetries(port):
+    attempt = 1
+    opened = False
+    while attempt < 50 and not opened:
+        try:
+            port = serial.Serial(port,  baudrate=9600, timeout=1)
+            opened = port.isOpen()
+        except serial.SerialException:
+            #print (port + " not available")
+            time.sleep(500/1000)
+        attempt += 1
+    if attempt >= 50:
+        return None
+    else:
+        return port
 
 ################### MAIN #############################################"
 # Serial ports for Arduino connections
 # DD : accept waiting a bit for the arduino to start
 # so that one can start sensor reading before arduinbo is plugged in
-# TODO : check if really necessary 
-attempt = 1
-opened = False
-while attempt < 50 and not opened:
-    try:
-        port0 = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=1)
-        opened = port0.isOpen()
-    except serial.SerialException:
-        print ("/dev/ttyUSB0 not available")
-        time.sleep(500/1000)
-    attempt += 1
-if attempt >= 50:
-    quit()
-           
+# TODO : check if really necessary
 
-
+port0 = openSerialRetries("/dev/ttyUSB0")
+     
 if sensorsNum >1 :
-    port1 = serial.Serial("/dev/ttyUSB1", baudrate=9600, timeout=1)
+    port1 = openSerialRetries("/dev/ttyUSB1")
+else :
+    port1 = None 
 
 # Create CSV file if it doesn't exist
-csv_file = 'sensor_data.csv'
-if not os.path.exists(csv_file):
-    with open(csv_file, 'w') as f:
-        f.write('Timestamp,ReadNumber,SensorName,Parameter,Value\n')
+# and put header only at creation
+csvFileName = 'sensor_data.csv'
+if not os.path.exists(csvFileName):
+    with open(csvFileName, 'w') as f:
+        f.write('Timestamp,ReadNumber,Source,SensorName,Parameter,Value\n')
 
+# DD reopen file in append to avoid frequent open/close
+# in that case, think of flushing
+# Note we also might need to use os.fsync() to ensure written on file
+csvFile = open(csvFileName, 'a')
+        
 # Main loop to read data from Arduinos
+# DD TODO consider whether to read last row of file to
+# restart at last readNumber +1 instead of 0 
 read_number = 1
 try:
     while True:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Read data from Arduino 0
-        arduino0_data = read_arduino(port0, 'Arduino0')
-        if arduino0_data: # read a non-empty dat-a during timeout
-            arduino0_data = [timestamp, str(read_number)] + arduino0_data
-            write_to_csv(arduino0_data, csv_file)
-        
-        # Read data from Arduino 1
-        if sensorsNum > 1:
+        if port0:       # Read data from Arduino 0
+            arduino0_data = read_arduino(port0, 'Arduino0')
+            if arduino0_data: # read a non-empty dat-a during timeout
+                arduino0_data = [timestamp, str(read_number)] + arduino0_data
+                write_to_csv(arduino0_data, csvFile)
+            
+        if port1:      # Read data from Arduino 1
             arduino1_data = read_arduino(port1, 'Arduino1')
             arduino1_data = [timestamp, str(read_number)] + arduino1_data
-            write_to_csv(arduino1_data, csv_file)
-        
-         # Increment read number after both Arduinos have been read
-    read_number += 1
+            write_to_csv(arduino1_data, csvFile)
+            
+        # Increment read number after both Arduinos have been read
+        read_number += 1
 
 except KeyboardInterrupt:
     print("\nData collection stopped.")
