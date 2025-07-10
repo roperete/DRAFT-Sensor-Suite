@@ -22,7 +22,7 @@
 #define pinMQ4 A0 //Analog input 0 of your arduino
 #define typeMQ4 "MQ-4" //MQ135
 
-#define MQ135R0 24.45
+#define MQ135R0 29
 #define MQ135RL 1.98
 #define MQ135A 110.47 // CO2
 #define MQ135B -2.862
@@ -228,8 +228,6 @@ void setup() {
   mySensor.initAirQuality();
 }
 
-///////////////////////////////// LOOP /////////////////////////
-
 void loop() {
   float R0=0;
   DFRobot_LWLP::sLwlp_t data;
@@ -258,46 +256,42 @@ void loop() {
   for(int i = 0; i < 180; i++) {
     unsigned long startTime = millis();    
 
-// TODO DD: find what sensor & gas  to putr in CSV for MQ sensors
 
 #if HUMAN_READABLE == 1  
     Serial.print(F(" Sensing loop: ")); Serial.println(i);
 #endif    
      // 1.4V sensing for the MQ7
     float mq7 = readMQ(pinMQ7,MQ7RL,MQ7R0,MQ7A,MQ7B);
-
 #if HUMAN_READABLE == 1 
     Serial.print(F(" MQ7 READING : "));
     Serial.print(mq7);
     Serial.print(F(" ppm"));
 #else
-    printCSV("MQ7", "MQ7", mq7 );
+    printCSV("MQ7", "CO", mq7 );
 #endif    
 
     float mq4 = readMQ(pinMQ4,MQ4RL,MQ4R0,MQ4A,MQ4B,VpinMQ4) ;  
-
 #if HUMAN_READABLE == 1     
     Serial.print(F("\n MQ4 READING : "));
     Serial.print(mq4);
     Serial.print(F(" ppm"));
 #else
-    printCSV("MQ4", "MQ4", mq4 );
+    printCSV("MQ4", "CH4", mq4 );
 #endif    
 
     float mq135 = readMQ(pinMQ135,MQ135RL,MQ135R0,MQ135A,MQ135B,VpinMQ135);
-
 #if HUMAN_READABLE == 1   
     Serial.print(F("\n MQ135 READING : "));
     Serial.print(mq135);;
     Serial.print(F(" ppm"));
     //R0 = calculateR0(pinMQ135,MQ135RL,MQ135A,MQ135B,850);
 #else
-    printCSV("MQ135", "MQ135", mq135 );
+    printCSV("MQ135", "CO2", mq135 );
 #endif    
 
-  mySensor.measureAirQuality();
+    mySensor.measureAirQuality();
 #if HUMAN_READABLE == 1  
-    Serial.print(F("\n SGP30 READING :"));  
+    Serial.print(F("\n SGP30 READING :"));
     Serial.print(F("CO2: "));
     Serial.print(mySensor.CO2);
 #else
