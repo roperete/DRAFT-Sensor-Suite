@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 
 
 # Specify the column names
-column_names = ['TimeStamp', 'ReadNumber', 'SensorSuite', 'Sensor', 'Gas', 'Value']
+column_names = ['Timestamp','ReadNumber','Source','SensorName','Parameter','Value']
 
 # Load the CSV file with the specified column names
-df = pd.read_csv('sensor_data.csv', delimiter=",", error_bad_lines=False, encoding=('utf-8'), names=column_names, skiprows=20)
+df = pd.read_csv('sensor_data.csv', delimiter=",",  encoding=('utf-8'), names=column_names, skiprows=20)
 
-# Split the 'Sensor', 'Gas', and 'Value' columns at the colon and take the second part
-df['Sensor'] = df['Sensor'].str.split(':', expand=True)[1]
-df['Gas'] = df['Gas'].str.split(':', expand=True)[1]
-df['Value'] = df['Value'].str.split(':', expand=True)[1]
+# Split the 'SensorName', 'Parameter'(often a Gas), and 'Value' columns at the colon and take the second part
+#df['Sensor'] = df['SensorName'].str.split(':', expand=True)[1]
+#df['Gas'] = df['Parameter'].str.split(':', expand=True)[1]
+#df['Value'] = df['Value'].str.split(':', expand=True)[1]
 
 # Convert 'Value' to numeric if it's supposed to be a number
 df['Value'] = pd.to_numeric(df['Value'], errors='coerce')
@@ -22,14 +22,12 @@ df['Value'] = pd.to_numeric(df['Value'], errors='coerce')
 # # Set the index to 'Timestamp'
 # df.set_index('Timestamp', inplace=True)
 
-
-
 # Assuming 'df' is your DataFrame
 df['Value'] = df['Value'].fillna(0)  # Fill missing values with 0
 
 
 # Define the gases you want to plot
-gases = ['CO2','TVOC','H2','Ethanol', 'Alcohol', 'Benzene', 'Hexane', 'CO2', 'Toluene', 'NH4', 'Acetone', 'CO']
+gases = ['CO2','TVOC','CH4', 'CO']
 
 # Initialize a figure with subplots
 fig, axs = plt.subplots(len(gases), 1, figsize=(10, 20))
@@ -37,8 +35,8 @@ fig, axs = plt.subplots(len(gases), 1, figsize=(10, 20))
 # Loop through each gas and plot the data for Arduino0 and Arduino1
 for i, gas in enumerate(gases):
     # Filter the data for the current gas
-    arduino0_data = df[(df['SensorSuite'] == 'Arduino0') & (df['Gas'] == gas)]['Value']
-    arduino1_data = df[(df['SensorSuite'] == 'Arduino1') & (df['Gas'] == gas)]['Value']
+    arduino0_data = df[(df['Source'] == 'Arduino0') & (df['Parameter'] == gas)]['Value']
+    arduino1_data = df[(df['Source'] == 'Arduino1') & (df['Parameter'] == gas)]['Value']
 
     
     # Plot the data
