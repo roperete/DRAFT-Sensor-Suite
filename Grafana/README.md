@@ -1,14 +1,53 @@
-# Grafana charting
+# Grafana
+Grafana is a WEB application that can consume varied sources of data and enables to create and configure rich dashboards. A free software version exists that we are going to use, see [open source grafana](https://grafana.com/oss/grafana/).
+
 Using grafana enables to provide users with a feature rich graph visualisation, zooming over a period of time as well as enabling access to charts remotely.
 
-## Install Grafana on the Raspberry pi
+## Install Grafana on the Raspberry Pi 5
+to install the current version of grafana (arm 64) on raspi, directly, use the following commands:
+
+```
+sudo apt-get install -y adduser libfontconfig1 musl   
+wget https://dl.grafana.com/oss/release/grafana-rpi_12.0.2_armhf.deb  
+sudo dpkg -i grafana-rpi_12.0.2_armhf.deb
+```
+
+
+**Remark** alternatively, it is possible to enable installing through the raspberry pi OS package manager, see [grafana on raspberry pi 5](https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
+Note that you might need to tweak a bit some instructions that are obsolete, in particular about the keyring management: they are now stored in `/usr/share/keyrings` and not `/etc/apt/keyrings`.
+
+We select the direct method.
+
+
+### Starting Grafana
+1. starting it once :   
+`sudo /bin/systemctl start grafana-server`
+2. starting it automatically, relying on systemd  
+	```
+	sudo /bin/systemctl daemon-reload
+	sudo /bin/systemctl enable grafana-server
+	```
+
+
+
+
+## Configuring Grafana
 
 ### Required plugin for CSV files
 Install the Infinity plugin
 
 *HOW TO*
 
-### A mini http server
+### Accounts
+
+### Data source
+
+
+### Dashboards and visualisation
+
+#### Importing a predefined dashboard 
+
+## A mini http server
 The infinity plugin requires a way to GET the file from a HTTP server. The server needs a minimal set of features
 
 * support GET calls
@@ -30,15 +69,3 @@ The infinity plugin requires a way to GET the file from a HTTP server. The serve
     * starts as a daemon under systemd
 
 **Final choice**
-
-
-## Configuring Grafana
-
-### Accounts
-
-### Data source
-
-
-### Dashboards and visualisation
-
-#### Importing a predefined dashboard 
