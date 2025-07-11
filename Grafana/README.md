@@ -29,21 +29,29 @@ We select the direct method.
 	```
 
 
-
-
 ## Configuring Grafana
 
-### Required plugin for CSV files
-Install the Infinity plugin
 
-*HOW TO*
 
 ### Accounts
+At start, you have to choose a password for the admin account.
+
+Once dashboards created, create a `user` account that can read dashboards but not edit them.
+This acount will be used by generic users reading the graphs.
 
 ### Data source
+Create a data source for the csv file. Reading CSV files rely on the *Infinity* plugin.
+
+**TODO** *decide where to put the CSV file*
+
+#### Install Ininity Plugin
+
+
 
 
 ### Dashboards and visualisation
+
+#### Creating a dashboard
 
 #### Importing a predefined dashboard 
 
