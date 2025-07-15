@@ -66,7 +66,7 @@ else :
 
 # Create CSV file if it doesn't exist
 # and put header only at creation
-csvFileName = 'sensor_data.csv'
+csvFileName = '../Data/sensor_data.csv'
 if not os.path.exists(csvFileName):
     with open(csvFileName, 'w') as f:
         f.write('Timestamp,ReadNumber,Source,SensorName,Parameter,Value\n')
@@ -86,7 +86,7 @@ try:
         
         if port0:       # Read data from Arduino 0
             arduino0_data = read_arduino(port0, 'Arduino0')
-            if arduino0_data: # read a non-empty dat-a during timeout
+            if arduino0_data: # read a non-empty data during timeout
                 arduino0_data = [timestamp, str(read_number)] + arduino0_data
                 write_to_csv(arduino0_data, csvFile)
             
