@@ -94,7 +94,7 @@ It will use the port 3003 and serve only files from the folder `/home/spring/Dat
 - Set its name (Arduino0)
 - Set Authentication (No Auth)
 - Set URL
-<img width="989" height="522" alt="URL" src="https://github.com/user-attachments/assets/03ce0fb3-fcc5-4fe4-bd53-ed6aeae71af3" />
+<img width="494" height="262" alt="URL" src="https://github.com/user-attachments/assets/03ce0fb3-fcc5-4fe4-bd53-ed6aeae71af3" />
 
 
 - Hit Save & Test, that should provide a positive return
