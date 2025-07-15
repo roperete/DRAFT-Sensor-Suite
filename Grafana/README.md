@@ -95,6 +95,8 @@ It will use the port 3003 and serve only files from the folder `/home/spring/Dat
 - Set Authentication (No Auth)
 - Set URL
 <img width="428" height="212" alt="URL" src="https://github.com/user-attachments/assets/a386ab2d-1262-4670-82ca-4001cc7e5ab6" />
+- Hit Save & Test, that should provide a positive return
+<img width="386" height="212" alt="save-test" src="https://github.com/user-attachments/assets/d544dc1a-35d2-457a-8678-868e54a976b8" />
 
 
 
