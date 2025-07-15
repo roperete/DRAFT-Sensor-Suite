@@ -21,7 +21,9 @@ We select the direct method.
 
 ### Starting Grafana
 1. starting it once :   
-`sudo /bin/systemctl start grafana-server`
+	```
+	sudo /bin/systemctl start grafana-server
+	```	
 2. starting it automatically, relying on systemd  
 	```
 	sudo /bin/systemctl daemon-reload
@@ -30,7 +32,9 @@ We select the direct method.
 
 
 ## Configuring Grafana
-
+Once installed and started, 
+- if your raspberry pi is connected to a network with IP address `IPADDR`, then you can connect from a bowser on a machine that has access to the same nework, with URL: `http://<IPADDR>:3000`
+- if your raspberry pi is not connected to a network, then use the raspberry browser and connect to `http://127.0.0.1:3000` or `http://localhost:3000`
 
 
 ### Accounts
@@ -41,6 +45,11 @@ This acount will be used by generic users reading the graphs.
 
 ### Data source
 Create a data source for the csv file. Reading CSV files rely on the *Infinity* plugin.
+- log in as admin
+- go to administration/plugins and data
+- search for Infinity
+- install infinity
+- ![](../../../Images/Capture d’écran du 2025-07-15 15-42-28.png)
 
 **TODO** *decide where to put the CSV file*
 
