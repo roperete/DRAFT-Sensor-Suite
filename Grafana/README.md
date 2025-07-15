@@ -67,9 +67,10 @@ Create a data source for the csv file. Reading CSV files rely on the *Infinity* 
 - search for Infinity
 - install infinity
 
-![Install](Grafana/Capture d’écran du 2025-07-15 15-42-28.png)
+<img width="432" height="282" alt="Capture d’écran du 2025-07-15 15-42-28" src="https://github.com/user-attachments/assets/1e879941-46be-4c18-8b9a-0b58cfc4c4c0" />
 
-<img width="919" height="325" alt="Install2" src="https://github.com/user-attachments/assets/e0ca5327-6bc5-4505-82d0-00d0d9a96122" />
+
+<img width="459" height="162" alt="Install2" src="https://github.com/user-attachments/assets/e0ca5327-6bc5-4505-82d0-00d0d9a96122" />
 
 
 #### Http Server 
