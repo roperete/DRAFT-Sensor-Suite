@@ -50,7 +50,7 @@ Create a data source for the csv file. Reading CSV files rely on the *Infinity* 
 - search for Infinity
 - install infinity
 
-![Install](relative%20Capture d’écran du 2025-07-15 15-42-28.png?raw=true "Install")
+![Install](./Capture d’écran du 2025-07-15 15-42-28.png)
 
 **TODO** *decide where to put the CSV file*
 
