@@ -68,6 +68,7 @@ Create a data source for the csv file. Reading CSV files rely on the *Infinity* 
 - install infinity
 
 ![Install](Grafana/Capture d’écran du 2025-07-15 15-42-28.png)
+
 ![Install 2nd step](Grafana/Install2.png)
 
 
