@@ -49,7 +49,7 @@ Create a data source for the csv file. Reading CSV files rely on the *Infinity* 
 - go to administration/plugins and data
 - search for Infinity
 - install infinity
-![Install](Capture d’écran du 2025-07-15 15-42-28.png)
+![Install](relative%20Capture d’écran du 2025-07-15 15-42-28.png?raw=true "Install")
 
 **TODO** *decide where to put the CSV file*
 
