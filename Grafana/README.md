@@ -93,6 +93,9 @@ It will use the port 3003 and serve only files from the folder `/home/spring/Dat
 - choose type "Infinity"
 - Set its name (Arduino0)
 - Set Authentication (No Auth)
+- Set URL
+<img width="428" height="212" alt="URL" src="https://github.com/user-attachments/assets/a386ab2d-1262-4670-82ca-4001cc7e5ab6" />
+
 
 
 ### Dashboards and visualisation
