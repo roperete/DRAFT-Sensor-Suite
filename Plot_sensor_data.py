@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 column_names = ['Timestamp','ReadNumber','Source','SensorName','Parameter','Value']
 
 # Load the CSV file with the specified column names
-df = pd.read_csv('sensor_data.csv', delimiter=",",  encoding=('utf-8'), names=column_names, skiprows=20)
+df = pd.read_csv('../Data/sensor_data.csv', delimiter=",",  encoding=('utf-8'), names=column_names, skiprows=20)
 
 # Split the 'SensorName', 'Parameter'(often a Gas), and 'Value' columns at the colon and take the second part
 #df['Sensor'] = df['SensorName'].str.split(':', expand=True)[1]
