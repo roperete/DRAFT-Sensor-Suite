@@ -2,7 +2,7 @@
   "__inputs": [
     {
       "name": "DS_ARDUINO0",
-      "label": "arduino0",
+      "label": "Arduino0",
       "description": "",
       "type": "datasource",
       "pluginId": "yesoreyeram-infinity-datasource",
@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.0.2"
+      "version": "12.1.0-253421"
     },
     {
       "type": "panel",
@@ -100,7 +100,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -131,7 +132,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0-253421",
       "targets": [
         {
           "columns": [
@@ -182,7 +183,7 @@
           "source": "url",
           "type": "csv",
           "uql": "parse-csv",
-          "url": "",
+          "url": "http://localhost:3003/sensor_data.csv",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -244,7 +245,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -275,7 +277,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.2",
+      "pluginVersion": "12.1.0-253421",
       "targets": [
         {
           "columns": [
@@ -339,8 +341,8 @@
   },
   "timepicker": {},
   "timezone": "utc",
-  "title": "sgp30",
+  "title": "sgp30-MQ",
   "uid": "abd6c751-552d-4090-adf9-fd348523d420",
-  "version": 28,
+  "version": 3,
   "weekStart": ""
 }
