@@ -69,7 +69,8 @@ Create a data source for the csv file. Reading CSV files rely on the *Infinity* 
 
 ![Install](Grafana/Capture d’écran du 2025-07-15 15-42-28.png)
 
-![Next step](Grafana/Install2.png)
+<img width="919" height="325" alt="Install2" src="https://github.com/user-attachments/assets/e0ca5327-6bc5-4505-82d0-00d0d9a96122" />
+
 
 #### Http Server 
 Install and configure a small HTTP server that will serve the data file (Data/sensor_data.csv)to the Infinity Data Source.
