@@ -20,7 +20,7 @@ to
 From there, you can install grafana with the pack	ge manager on the raspberry pi.
 
 **NOTE** : the default install did not work, the nightly built as of 15/Jul/2025 did.   
-The isntalled package is the open source 'gafana-nightly-12.1.0-253421' 64 bits.
+The installed package is the open source 'gafana-nightly-12.1.0-253421' 64 bits.
 
 
 
@@ -69,8 +69,7 @@ Create a data source for the csv file. Reading CSV files rely on the *Infinity* 
 
 ![Install](Grafana/Capture d’écran du 2025-07-15 15-42-28.png)
 
-![Install 2nd step](Grafana/Install2.png)
-
+![Next step](Grafana/Install2.png)
 
 #### Http Server 
 Install and configure a small HTTP server that will serve the data file (Data/sensor_data.csv)to the Infinity Data Source.
