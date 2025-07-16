@@ -145,6 +145,14 @@ use mini_httpd a it is lighter and the drawbacks are not blocking.
 - grafana is set to start at boot
 - go to `/home/spring/DRAFT-Sensor-Suite`
 - run `sh start_http.sh`
-- run  `python3 SensorReading.py`
+- run  `python3 SensorReading.py &`
+
+Note:
+to view the collected CSV; two alternatives
+1. connect with a browser to the raspbery pi on port 3003   
+ example `http://localhost:3003`
+2. on a raspberry pi terminal or ssh terminal :  
+`tail -f ~spring/Data/sensor_data.csv`   
+End this display with Ctl-C.
 
 

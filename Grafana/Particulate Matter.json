@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.1.0-253421"
+      "version": "12.1.0-253717"
     },
     {
       "type": "panel",
@@ -118,8 +118,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "value {Sensor=\"PM\", Source=\"Arduino1\", Type=\"PM10\"}",
-                  "value {Sensor=\"PM\", Source=\"Arduino0\", Type=\"PM10\"}"
+                  "value"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -158,7 +157,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0-253421",
+      "pluginVersion": "12.1.0-253717",
       "targets": [
         {
           "columns": [
@@ -222,8 +221,8 @@
     "list": []
   },
   "time": {
-    "from": "2025-07-16T11:08:03.000Z",
-    "to": "2025-07-16T11:18:38.000Z"
+    "from": "now-5m",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
