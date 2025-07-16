@@ -113,7 +113,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 11,
         "w": 11,
         "x": 0,
         "y": 0
@@ -169,6 +169,10 @@
               "type": "string"
             }
           ],
+          "csv_options": {
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
           "datasource": {
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_ARDUINO0}"
@@ -258,8 +262,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 11,
+        "w": 13,
         "x": 11,
         "y": 0
       },
@@ -300,6 +304,11 @@
               "selector": "Value",
               "text": "Value",
               "type": "number"
+            },
+            {
+              "selector": "Source",
+              "text": "Source",
+              "type": "string"
             }
           ],
           "csv_options": {
@@ -336,13 +345,13 @@
     "list": []
   },
   "time": {
-    "from": "2025-07-10T15:46:21.000Z",
-    "to": "2025-07-10T16:57:02.000Z"
+    "from": "2025-07-16T11:07:54.000Z",
+    "to": "2025-07-16T11:09:11.000Z"
   },
   "timepicker": {},
   "timezone": "utc",
   "title": "sgp30-MQ",
   "uid": "abd6c751-552d-4090-adf9-fd348523d420",
-  "version": 3,
+  "version": 6,
   "weekStart": ""
 }

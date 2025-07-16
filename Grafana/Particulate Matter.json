@@ -118,7 +118,8 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "value"
+                  "value {Sensor=\"PM\", Source=\"Arduino1\", Type=\"PM10\"}",
+                  "value {Sensor=\"PM\", Source=\"Arduino0\", Type=\"PM10\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -138,8 +139,8 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 11,
+        "w": 22,
         "x": 0,
         "y": 0
       },
@@ -180,8 +181,17 @@
               "selector": "Value",
               "text": "value",
               "type": "number"
+            },
+            {
+              "selector": "Source",
+              "text": "Source",
+              "type": "string"
             }
           ],
+          "csv_options": {
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
           "datasource": {
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_ARDUINO0}"
@@ -212,13 +222,13 @@
     "list": []
   },
   "time": {
-    "from": "2025-07-10T15:46:21.000Z",
-    "to": "2025-07-10T16:57:02.000Z"
+    "from": "2025-07-16T11:08:03.000Z",
+    "to": "2025-07-16T11:18:38.000Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Particulate Matter",
   "uid": "d1705196-4f39-4240-b31d-7360f6436b12",
-  "version": 4,
+  "version": 7,
   "weekStart": ""
 }
