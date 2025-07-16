@@ -9,9 +9,12 @@ import serial
 import os
 import time
 from datetime import datetime
+from pytz import timezone
 
 # sensorsNum has value 1 or 2 , it is the number of arduino connections
-sensorsNum = 2
+sensorsNum =2
+
+UTC=timezone('UTC')
 
 # Function to read data from Arduino
 # TODO : DD consider returning empty list when data is empty to enable not writing
@@ -82,7 +85,7 @@ csvFile = open(csvFileName, 'a')
 read_number = 1
 try:
     while True:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
         
         if port0:       # Read data from Arduino 0
             arduino0_data = read_arduino(port0, 'Arduino0')
