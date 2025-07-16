@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 # sensorsNum has value 1 or 2 , it is the number of arduino connections
-sensorsNum =1
+sensorsNum = 2
 
 # Function to read data from Arduino
 # TODO : DD consider returning empty list when data is empty to enable not writing
