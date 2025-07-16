@@ -106,7 +106,9 @@ It will use the port 3003 and serve only files from the folder `/home/spring/Dat
 ### Dashboards and visualisation
 #### Importing a predefined dashboard 
 A dashboard export named `sgp30-MQ.json` is ready for import. It contain gases measurements.
-** TODO ** put images
+
+**TODO** put images
+
 - Go to dashboards
 - select Add new dashboard
 - select Import
@@ -137,3 +139,12 @@ The infinity plugin requires a way to GET the file from a HTTP server. The serve
     * starts as a daemon under systemd
 
 **Final choice**
+use mini_httpd a it is lighter and the drawbacks are not blocking.
+
+# Start it All
+- grafana is set to start at boot
+- go to `/home/spring/DRAFT-Sensor-Suite`
+- run `sh start_http.sh`
+- run  `python3 SensorReading.py`
+
+
